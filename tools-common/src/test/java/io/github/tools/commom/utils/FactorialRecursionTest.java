@@ -4,6 +4,9 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
+/**
+ * 尾递归测试
+ */
 public class FactorialRecursionTest {
     @Test
     public void testRecursion(){

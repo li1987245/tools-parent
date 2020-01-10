@@ -1,8 +1,12 @@
 package io.github.tools.dataframe.column
 
 import java.util.Comparator
+import java.lang.Iterable
+
+import io.github.tools.dataframe.column.ColumnType._
 
 trait Column[T] extends Iterable[T] with Comparator[T] {
+
   val size: Int
 
   val asObjectArray: Array[T]
