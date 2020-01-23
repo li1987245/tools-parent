@@ -1,5 +1,7 @@
 package io.github.tools.dataframe.function
 
-trait Aggregate[I, O] extends Function[Array[I], O] {
+import io.github.tools.dataframe.column.{Column, NumericColumn}
 
+trait Aggregate[O] extends Function[NumericColumn[_ <: Number], O] {
+  val name: String
 }

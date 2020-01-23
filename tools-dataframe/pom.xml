@@ -48,6 +48,10 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging_${scala.main.version}</artifactId>
+        </dependency>
         <!-- 添加slf4j日志api -->
         <dependency>
             <groupId>org.slf4j</groupId>

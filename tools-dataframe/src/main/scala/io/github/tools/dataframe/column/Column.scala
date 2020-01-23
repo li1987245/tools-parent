@@ -1,43 +1,32 @@
 package io.github.tools.dataframe.column
 
-import java.util.Comparator
-import java.lang.Iterable
 
 import io.github.tools.dataframe.column.ColumnType._
 
-trait Column[T] extends Iterable[T] with Comparator[T] {
+import scala.beans.BeanProperty
 
-  val size: Int
+trait Column[T] extends Iterable[T] {
 
-  val asObjectArray: Array[T]
+  @BeanProperty var size: Int
+
+  @BeanProperty var name: String
+  @BeanProperty var columnType: ColumnType
+
+  def toArray: Array[T]
 
   /**
     * Returns the count of missing values in this column.
     *
     * @return missing values as int
     */
-  val countMissing: Int
+  def countMissing: Int
 
   /**
     * Returns the count of unique values in this column.
     *
     * @return unique values as int
     */
-  val countUnique: Int = unique().size
-
-  /**
-    * Returns the column's name.
-    *
-    * @return name as String
-    */
-  val name: String
-
-  /**
-    * Returns this column's ColumnType
-    *
-    * @return { @link ColumnType}
-    */
-  val columnType: ColumnType
+  def countUnique: Int = unique().size
 
   /**
     * Returns a string representation of the value at the given row.
@@ -46,6 +35,8 @@ trait Column[T] extends Iterable[T] with Comparator[T] {
     * @return value as String
     */
   def getString(row: Int): String
+
+  def append(element: T)
 
   def get(row: Int): T
 
