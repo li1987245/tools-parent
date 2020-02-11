@@ -6,8 +6,7 @@ import org.junit.Test
 class RoaringBitmapTest {
   @Test
   def testBitMap(): Unit = {
-    import scala.jdk.CollectionConverters._
-
+    import scala.collection.JavaConverters._
     val rr: RoaringBitmap = RoaringBitmap.bitmapOf(1, 2, 3, 1000)
     val rr2 = new RoaringBitmap
     rr2.add(4000L, 4255L)

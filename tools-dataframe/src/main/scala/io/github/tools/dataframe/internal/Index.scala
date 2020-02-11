@@ -1,14 +1,16 @@
-package io.github.tools.dataframe.index
+package io.github.tools.dataframe.internal
 
-import java.lang.Iterable
 import java.util
-import java.util.Map
 
-import scala.collection.JavaConverters._
 import com.google.common.collect.{BiMap, HashBiMap}
 import com.typesafe.scalalogging.Logger
 
-class Index[T] extends Iterable[util.Map.Entry[T, Int]] {
+import scala.collection.JavaConverters._
+
+class Index[T] extends Iterable[(T, Int)] {
+  self =>
+
+  //this别
 
   private[this] val logger = Logger(this.getClass)
   //双向map，name -> index index -> name
@@ -23,17 +25,19 @@ class Index[T] extends Iterable[util.Map.Entry[T, Int]] {
     }
   }
 
+  val add: T => Unit = self.extend
+
+  def add(name: T, idx: Int): Unit = {
+    index.put(name, idx)
+  }
+
   /**
     * 默认追加到最后
     *
     * @param name
     */
-  def add(name: T): Unit = {
-    add(name, index.values().asScala.max)
-  }
-
-  def add(name: T, idx: Int): Unit = {
-    index.put(name, idx)
+  def extend(name: T): Unit = {
+    add(name, size())
   }
 
   /**
@@ -56,6 +60,16 @@ class Index[T] extends Iterable[util.Map.Entry[T, Int]] {
   }
 
   /**
+    * 根据索引获取列名
+    *
+    * @param idx
+    * @return
+    */
+  def name(idx: Int): T = {
+    index.inverse().get(idx)
+  }
+
+  /**
     * 返回索引名称
     *
     * @return
@@ -64,5 +78,24 @@ class Index[T] extends Iterable[util.Map.Entry[T, Int]] {
     index.keySet.asScala.toSet
   }
 
-  override def iterator: util.Iterator[util.Map.Entry[T, Int]] = index.entrySet().iterator()
+  override def size(): Int = {
+    index.size()
+  }
+
+  override def iterator: Iterator[(T, Int)] = new Iterator[(T, Int)] {
+
+    val iter: util.Iterator[util.Map.Entry[T, Int]] = index.entrySet().iterator()
+
+    override def hasNext: Boolean = iter.hasNext
+
+    override def next(): (T, Int) = {
+      val entry = iter.next()
+      (entry.getKey, entry.getValue)
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val idx = new Index[String]()
+    idx.add("")
+  }
 }

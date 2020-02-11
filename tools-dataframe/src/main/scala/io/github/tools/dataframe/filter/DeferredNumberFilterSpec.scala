@@ -1,7 +1,7 @@
 package io.github.tools.dataframe.filter
 
 import io.github.tools.dataframe.function.Predicate
-import io.github.tools.dataframe.selection.{BitmapBackedSelection, Selection}
+import io.github.tools.dataframe.selection.{RoaringBitmapWrap, BitSet}
 
 object DeferredNumberFilterSpec extends NumberFilterSpec[Double] {
 

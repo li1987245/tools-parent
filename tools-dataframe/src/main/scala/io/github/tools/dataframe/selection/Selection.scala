@@ -1,58 +1,84 @@
 package io.github.tools.dataframe.selection
 
-import it.unimi.dsi.fastutil.ints.IntIterable
+import io.github.tools.dataframe.DataFrame
+import io.github.tools.dataframe.function.Predicate
+import io.github.tools.dataframe.internal.{BlockManager, Index}
+import io.github.tools.dataframe.column.Column
 
-trait Selection extends IntIterable {
+/**
+  * 获取数据切片
+  */
+object Selection {
 
-  def toArray: Array[Int]
+  def select(df: DataFrame, predicate: Predicate[List[Any]]): BitSet = {
+    val selected = new RoaringBitmapWrap()
+    for (row <- df.zipWithIndex) {
+      //判断是否满足条件
+      if (predicate.apply(row._1.asInstanceOf[List[Any]])) selected.append(row._2)
+    }
+    selected
+  }
+
+  def select[T](index: Index[T], selected: Seq[Int]): Index[T] = {
+    val idx = new Index[T]
+    for (i <- selected) {
+      idx.add(index.name(i))
+    }
+    idx
+  }
+
+  def select[T](index: Index[T], selected: BitSet): Index[T] = {
+    val idx = new Index[T]
+    for (i <- selected) {
+      idx.add(index.name(i))
+    }
+    idx
+  }
+
+  def select(blocks: BlockManager, rows: BitSet, cols: BitSet): BlockManager = {
+    val data = new BlockManager
+    for (col <- cols) {
+      val column: Column[_] = blocks.getColumn(col)
+      val _column: Column[_] = column.copyEmpty
+      for (row <- rows) {
+        _column.addObj(column.get(row))
+      }
+      data.addColumn(_column)
+    }
+    data
+  }
 
   /**
-    * Adds the given integers to the Selection if it is not already present, and does nothing
-    * otherwise
-    */
-  def add(ints: Int*): Selection
-
-  /**
-    * Adds to the current bitmap all integers in [rangeStart,rangeEnd)
+    * 按行列进行数据切片，生成新的DataFrame
     *
-    * @param start inclusive beginning of range
-    * @param end   exclusive ending of range
+    * @param df
+    * @param rows
+    * @param cols
+    * @return
     */
-  def addRange(start: Int, end: Int): Selection
+  def slice(df: DataFrame, rows: Array[Int], cols: Array[Int]): DataFrame = {
+    val result = new DataFrame
+    val columns = df.columns
+    for (col <- cols) {
+      val column = df.getColumn(col)
+      val _column = column.copyEmpty
+      for (row <- rows) {
+        _column.addObj(column.get(row))
+      }
+      result.addColumn(columns.name(col), _column)
+    }
+    result
+  }
 
-  def removeRange(start: Long, end: Long): Selection
+  def slice(df: DataFrame, rows: BitSet): DataFrame = {
+    val result = new DataFrame
+    val columns = df.columns
+    for (col <- columns) {
+      val column = df.getColumn(col._2)
+      val _column = column.slice(rows)
+      result.addColumn(col._1, _column)
+    }
+    result
+  }
 
-  def size: Int
-
-  /**
-    * Returns the intersection of the receiver and {@code otherSelection}, after updating the
-    * receiver
-    */
-  def and(otherSelection: Selection): Selection
-
-  /** Returns the union of the receiver and {@code otherSelection}, after updating the receiver */
-  def or(otherSelection: Selection): Selection
-
-  /**
-    * Implements the set difference operation between the receiver and {@code otherSelection}, after
-    * updating the receiver
-    */
-  def andNot(otherSelection: Selection): Selection
-
-  def isEmpty: Boolean
-
-  def clear: Selection
-
-  def contains(i: Int): Boolean
-
-  /**
-    * Returns the value of the ith element. For example, if there are three ints {4, 32, 71} in the
-    * selection, get(0) returns 4, get(1) returns 32, and get(2) returns 71
-    *
-    * <p>It can be useful if you need to iterate over the data, although there is also an iterator
-    */
-  def get(i: Int): Int
-
-  /** Returns a selection with the bits from this selection flipped over the given range */
-  def flip(rangeStart: Int, rangeEnd: Int): Selection
 }

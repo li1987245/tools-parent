@@ -2,9 +2,9 @@ package io.github.tools.dataframe.column
 
 import io.github.tools.dataframe.filter.Filter
 import io.github.tools.dataframe.function.Predicate
-import io.github.tools.dataframe.selection.{BitmapBackedSelection, Selection}
+import io.github.tools.dataframe.selection.{RoaringBitmapWrap, BitSet}
 
-abstract class NumericColumn[T <: Number] extends AbstractColumn[T] with Filter[T] {
+abstract class NumericColumn[T <: AnyVal] extends AbstractColumn[T] with Filter[T] {
 
 
   def getDouble(index: Int): Double
@@ -15,11 +15,11 @@ abstract class NumericColumn[T <: Number] extends AbstractColumn[T] with Filter[
     * @param predicate
     * @return
     */
-  override def eval(predicate: Predicate[T]): Selection = {
-    val selection: Selection = new BitmapBackedSelection()
+  override def eval(predicate: Predicate[T]): BitSet = {
+    val selection: BitSet = new RoaringBitmapWrap()
     for ((element, idx) <- this.zipWithIndex) {
-      if (predicate(element.doubleValue())) {
-        selection.add(idx)
+      if (predicate(element)) {
+        selection.append(idx)
       }
     }
     selection
