@@ -14,7 +14,7 @@
     </modules>
     <properties>
         <scala.version>2.13.1</scala.version>
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
     </properties>
     <dependencyManagement>
         <dependencies>
