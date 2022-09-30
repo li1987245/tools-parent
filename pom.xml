@@ -13,7 +13,7 @@
         <module>tools-common</module>
     </modules>
     <properties>
-        <scala.version>2.13.1</scala.version>
+        <scala.version>2.13.9</scala.version>
         <guava.version>28.1-jre</guava.version>
     </properties>
     <dependencyManagement>
